@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package proto;
+
+// login service def
+service LoginService{
+	rpc Login(User.Login) returns (User.Auth){} //登录
+	rpc Logout(User.Uid) returns (User.Auth){} //登出
+	rpc Registe(User.Login) returns (User.Auth){} //注册
+}
+
+message User{
+	message Login{
+		string uuid=1;
+		string host=2;
+		int32 login_type=3;
+	}
+	message Uid{
+		int32 uid=1;
+	}
+	message Auth{
+		int32 uid=1;
+		int32 stats=2;
+		int32 code=3;
+	}
+	message NullResult{
+	}
+
+	
+}
