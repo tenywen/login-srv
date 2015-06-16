@@ -1,0 +1,4 @@
+.godeps
+.godeps/*
+bin
+bin/*
