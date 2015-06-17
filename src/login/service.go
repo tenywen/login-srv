@@ -120,7 +120,7 @@ func (s *server) Login(ctx context.Context, in *pb.User_Login) (*pb.User_Auth, e
 		return nil, nil
 	}
 	user_fsm := FSM{}
-	err = db.Client.Get(TABLE_FSM, auth.Id, &user_fsm)
+	err = db.Redis.Get(TABLE_FSM, auth.Id, &user_fsm)
 	if err != nil {
 		log.Critical(err)
 		return nil, err
@@ -139,8 +139,8 @@ func (s *server) Login(ctx context.Context, in *pb.User_Login) (*pb.User_Auth, e
 		user_fsm.Status = ON_FREE
 	}
 	// save to redis db.
-	db.Client.Set(TABLE_FSM, auth.Id, user_fsm)
-	db.Client.Set(TABLE_AUTH, auth.Id, auth)
+	db.Redis.Set(TABLE_FSM, auth.Id, user_fsm)
+	db.Redis.Set(TABLE_AUTH, auth.Id, auth)
 
 	return &pb.User_Auth{Uid: user_fsm.Uid, Stats: int32(user_fsm.Status), NewUser: new_user}, nil
 }
@@ -160,7 +160,7 @@ func (s *server) Logout(ctx context.Context, in *pb.User_Uid) (*pb.User_Auth, er
 		return nil, nil
 	}
 	user_fsm := FSM{}
-	err := db.Client.Get(TABLE_FSM, uid, &user_fsm)
+	err := db.Redis.Get(TABLE_FSM, uid, &user_fsm)
 	if err != nil {
 		log.Critical(err)
 		return nil, err
