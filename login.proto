@@ -23,10 +23,10 @@ message User{
 		string login_ip =11; 
 	}
 	message Uid{
-		int64 uid=1;
+		int32 uid=1;
 	}
 	message Auth{
-		int64 uid=1;
+		int32 uid=1;
 		int32 stats=2;
 		bool new_user=3;
 	}

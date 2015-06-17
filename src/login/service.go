@@ -52,7 +52,7 @@ type server struct {
 }
 
 type FSM struct {
-	Uid    int64
+	Uid    int32
 	Host   string
 	Status int8
 	TS     int64
@@ -173,7 +173,7 @@ func (s *server) Logout(ctx context.Context, in *pb.User_Uid) (*pb.User_Auth, er
 	return &pb.User_Auth{Uid: user_fsm.Uid, Stats: int32(user_fsm.Status)}, nil
 }
 
-func (s *server) next_uid() int64 {
+func (s *server) next_uid() int32 {
 	c, err := services.GetService(services.SERVICE_SNOWFLAKE)
 	service, _ := c.(proto.SnowflakeServiceClient)
 	uid, err := service.Next(context.Background(), &proto.Snowflake_Key{Name: SEQS_UID})
@@ -181,5 +181,5 @@ func (s *server) next_uid() int64 {
 		log.Critical(err)
 		return 0
 	}
-	return uid.Value
+	return int32(uid.Value)
 }

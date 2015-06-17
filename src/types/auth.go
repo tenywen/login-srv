@@ -1,7 +1,7 @@
 package types
 
 type Auth struct {
-	Id            int64  //User Id
+	Id            int32  //User Id
 	Uuid          string //UUID
 	Cert          string //证书
 	Host          string //所在服务器

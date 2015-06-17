@@ -53,7 +53,7 @@ func (m *User_Login) String() string { return proto1.CompactTextString(m) }
 func (*User_Login) ProtoMessage()    {}
 
 type User_Uid struct {
-	Uid int64 `protobuf:"varint,1,opt,name=uid" json:"uid,omitempty"`
+	Uid int32 `protobuf:"varint,1,opt,name=uid" json:"uid,omitempty"`
 }
 
 func (m *User_Uid) Reset()         { *m = User_Uid{} }
@@ -61,7 +61,7 @@ func (m *User_Uid) String() string { return proto1.CompactTextString(m) }
 func (*User_Uid) ProtoMessage()    {}
 
 type User_Auth struct {
-	Uid     int64 `protobuf:"varint,1,opt,name=uid" json:"uid,omitempty"`
+	Uid     int32 `protobuf:"varint,1,opt,name=uid" json:"uid,omitempty"`
 	Stats   int32 `protobuf:"varint,2,opt,name=stats" json:"stats,omitempty"`
 	NewUser bool  `protobuf:"varint,3,opt,name=new_user" json:"new_user,omitempty"`
 }

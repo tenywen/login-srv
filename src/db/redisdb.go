@@ -38,7 +38,7 @@ func init() {
 
 }
 
-func (s *db) Get(tbl string, uid int64, data interface{}) error {
+func (s *db) Get(tbl string, uid int32, data interface{}) error {
 	raw, err := s.redis_client.Cmd("GET", fmt.Sprintf("%s:%s", tbl, uid)).Bytes()
 	if err != nil {
 		log.Critical(err)
@@ -53,7 +53,7 @@ func (s *db) Get(tbl string, uid int64, data interface{}) error {
 	return nil
 }
 
-func (s *db) Set(tbl string, uid int64, data interface{}) error {
+func (s *db) Set(tbl string, uid int32, data interface{}) error {
 	bin, err := msgpack.Marshal(data)
 	if err != nil {
 		log.Critical(err)
