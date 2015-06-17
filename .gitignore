@@ -1,4 +1,3 @@
 .godeps
-.godeps/*
 bin
-bin/*
+pkg
