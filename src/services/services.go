@@ -2,7 +2,7 @@ package services
 
 import (
 	"errors"
-	log "github.com/GameGophers/nsq-logger"
+	log "github.com/GameGophers/libs/nsq-logger"
 	"github.com/coreos/go-etcd/etcd"
 	"google.golang.org/grpc"
 	"os"

@@ -6,7 +6,7 @@ import (
 
 	"gopkg.in/vmihailenco/msgpack.v2"
 
-	log "github.com/GameGophers/nsq-logger"
+	log "github.com/GameGophers/libs/nsq-logger"
 	"github.com/fzzy/radix/redis"
 )
 

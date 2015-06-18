@@ -4,7 +4,7 @@ import (
 	"net"
 	"os"
 
-	log "github.com/GameGophers/nsq-logger"
+	log "github.com/GameGophers/libs/nsq-logger"
 	_ "github.com/GameGophers/statsd-pprof"
 	"google.golang.org/grpc"
 )
