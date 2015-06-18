@@ -71,6 +71,7 @@ func (s *server) Login(ctx context.Context, in *pb.User_LoginInfo) (*pb.User_Log
 	if uuid == "" {
 		return nil, errors.New("require uuid")
 	}
+	new_user := false
 	auth := Auth{}
 	switch login_type {
 	case LOGIN_TYPE_UUID:
@@ -94,6 +95,7 @@ func (s *server) Login(ctx context.Context, in *pb.User_LoginInfo) (*pb.User_Log
 			log.Info("registe new user : %+v", auth)
 			// save to redis db.
 			db.Redis.Set(TABLE_AUTH, auth.Id, auth)
+			new_user = true
 		}
 	case LOGIN_TYPE_WEIXIN:
 		fallthrough
@@ -103,7 +105,7 @@ func (s *server) Login(ctx context.Context, in *pb.User_LoginInfo) (*pb.User_Log
 		return nil, errors.New("not support yet")
 	}
 
-	return &pb.User_LoginResp{Uid: auth.Id}, nil
+	return &pb.User_LoginResp{Uid: auth.Id, NewUser: new_user}, nil
 }
 
 func (s *server) next_uid() int32 {
