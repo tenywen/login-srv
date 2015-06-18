@@ -34,41 +34,25 @@ func (m *User) Reset()         { *m = User{} }
 func (m *User) String() string { return proto1.CompactTextString(m) }
 func (*User) ProtoMessage()    {}
 
-type User_Login struct {
-	Uuid          string `protobuf:"bytes,1,opt,name=uuid" json:"uuid,omitempty"`
-	Host          string `protobuf:"bytes,2,opt,name=host" json:"host,omitempty"`
-	LoginType     int32  `protobuf:"varint,3,opt,name=login_type" json:"login_type,omitempty"`
-	Cert          string `protobuf:"bytes,4,opt,name=cert" json:"cert,omitempty"`
-	ClientVersion string `protobuf:"bytes,5,opt,name=client_version" json:"client_version,omitempty"`
-	Lang          string `protobuf:"bytes,6,opt,name=lang" json:"lang,omitempty"`
-	Appid         string `protobuf:"bytes,7,opt,name=appid" json:"appid,omitempty"`
-	OsVersion     string `protobuf:"bytes,8,opt,name=os_version" json:"os_version,omitempty"`
-	DeviceName    string `protobuf:"bytes,9,opt,name=device_name" json:"device_name,omitempty"`
-	DeviceId      string `protobuf:"bytes,10,opt,name=device_id" json:"device_id,omitempty"`
-	LoginIp       string `protobuf:"bytes,11,opt,name=login_ip" json:"login_ip,omitempty"`
+type User_LoginInfo struct {
+	Uuid      string `protobuf:"bytes,1,opt,name=uuid" json:"uuid,omitempty"`
+	LoginType int32  `protobuf:"varint,2,opt,name=login_type" json:"login_type,omitempty"`
+	Username  string `protobuf:"bytes,3,opt,name=username" json:"username,omitempty"`
+	Passwd    string `protobuf:"bytes,4,opt,name=passwd" json:"passwd,omitempty"`
+	Host      string `protobuf:"bytes,5,opt,name=host" json:"host,omitempty"`
 }
 
-func (m *User_Login) Reset()         { *m = User_Login{} }
-func (m *User_Login) String() string { return proto1.CompactTextString(m) }
-func (*User_Login) ProtoMessage()    {}
+func (m *User_LoginInfo) Reset()         { *m = User_LoginInfo{} }
+func (m *User_LoginInfo) String() string { return proto1.CompactTextString(m) }
+func (*User_LoginInfo) ProtoMessage()    {}
 
-type User_Uid struct {
+type User_LoginResp struct {
 	Uid int32 `protobuf:"varint,1,opt,name=uid" json:"uid,omitempty"`
 }
 
-func (m *User_Uid) Reset()         { *m = User_Uid{} }
-func (m *User_Uid) String() string { return proto1.CompactTextString(m) }
-func (*User_Uid) ProtoMessage()    {}
-
-type User_Auth struct {
-	Uid     int32 `protobuf:"varint,1,opt,name=uid" json:"uid,omitempty"`
-	Stats   int32 `protobuf:"varint,2,opt,name=stats" json:"stats,omitempty"`
-	NewUser bool  `protobuf:"varint,3,opt,name=new_user" json:"new_user,omitempty"`
-}
-
-func (m *User_Auth) Reset()         { *m = User_Auth{} }
-func (m *User_Auth) String() string { return proto1.CompactTextString(m) }
-func (*User_Auth) ProtoMessage()    {}
+func (m *User_LoginResp) Reset()         { *m = User_LoginResp{} }
+func (m *User_LoginResp) String() string { return proto1.CompactTextString(m) }
+func (*User_LoginResp) ProtoMessage()    {}
 
 type User_NullResult struct {
 }
@@ -83,8 +67,7 @@ func init() {
 // Client API for LoginService service
 
 type LoginServiceClient interface {
-	Login(ctx context.Context, in *User_Login, opts ...grpc.CallOption) (*User_Auth, error)
-	Logout(ctx context.Context, in *User_Uid, opts ...grpc.CallOption) (*User_Auth, error)
+	Login(ctx context.Context, in *User_LoginInfo, opts ...grpc.CallOption) (*User_LoginResp, error)
 }
 
 type loginServiceClient struct {
@@ -95,18 +78,9 @@ func NewLoginServiceClient(cc *grpc.ClientConn) LoginServiceClient {
 	return &loginServiceClient{cc}
 }
 
-func (c *loginServiceClient) Login(ctx context.Context, in *User_Login, opts ...grpc.CallOption) (*User_Auth, error) {
-	out := new(User_Auth)
+func (c *loginServiceClient) Login(ctx context.Context, in *User_LoginInfo, opts ...grpc.CallOption) (*User_LoginResp, error) {
+	out := new(User_LoginResp)
 	err := grpc.Invoke(ctx, "/proto.LoginService/Login", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *loginServiceClient) Logout(ctx context.Context, in *User_Uid, opts ...grpc.CallOption) (*User_Auth, error) {
-	out := new(User_Auth)
-	err := grpc.Invoke(ctx, "/proto.LoginService/Logout", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,8 +90,7 @@ func (c *loginServiceClient) Logout(ctx context.Context, in *User_Uid, opts ...g
 // Server API for LoginService service
 
 type LoginServiceServer interface {
-	Login(context.Context, *User_Login) (*User_Auth, error)
-	Logout(context.Context, *User_Uid) (*User_Auth, error)
+	Login(context.Context, *User_LoginInfo) (*User_LoginResp, error)
 }
 
 func RegisterLoginServiceServer(s *grpc.Server, srv LoginServiceServer) {
@@ -125,23 +98,11 @@ func RegisterLoginServiceServer(s *grpc.Server, srv LoginServiceServer) {
 }
 
 func _LoginService_Login_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
-	in := new(User_Login)
+	in := new(User_LoginInfo)
 	if err := codec.Unmarshal(buf, in); err != nil {
 		return nil, err
 	}
 	out, err := srv.(LoginServiceServer).Login(ctx, in)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func _LoginService_Logout_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
-	in := new(User_Uid)
-	if err := codec.Unmarshal(buf, in); err != nil {
-		return nil, err
-	}
-	out, err := srv.(LoginServiceServer).Logout(ctx, in)
 	if err != nil {
 		return nil, err
 	}
@@ -155,10 +116,6 @@ var _LoginService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _LoginService_Login_Handler,
-		},
-		{
-			MethodName: "Logout",
-			Handler:    _LoginService_Logout_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{},

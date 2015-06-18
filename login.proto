@@ -4,31 +4,19 @@ package proto;
 
 // login service def
 service LoginService{
-	rpc Login(User.Login) returns (User.Auth){} //登录
-	rpc Logout(User.Uid) returns (User.Auth){} //登出
+	rpc Login(User.LoginInfo) returns (User.LoginResp){} //登录
 }
 
 message User{
-	message Login{
-		string uuid=1;
-		string host=2;
-		int32 login_type=3;
-		string cert=4;
-		string client_version=5;
-		string lang=6;
-		string	appid=7;
-		string os_version=8;
-		string device_name=9;
-		string device_id=10;
-		string login_ip =11; 
+	message LoginInfo{
+		string	uuid	= 1;
+		int32	login_type= 2;//facebook, webo, qq, sina, alipay
+		string	username= 3; //the login type account 
+		string	passwd	= 4; //passwd, token, and so on.
+		string host	= 5; //login host	
 	}
-	message Uid{
-		int32 uid=1;
-	}
-	message Auth{
-		int32 uid=1;
-		int32 stats=2;
-		bool new_user=3;
+	message LoginResp{
+		int32	uid 	= 1;
 	}
 	message NullResult{
 	}
