@@ -7,3 +7,4 @@ gopkg.in/vmihailenco/msgpack.v2 v2.3
 gopkg.in/mgo.v2 r2015.01.24
 github.com/fzzy/radix/redis 95792b6854f0f739cc4bbb5691f90f5e776c7c17
 github.com/coreos/go-etcd/etcd 11803862ebb77bb451b70d790fe036bf4688ba22
+github.com/peterbourgon/g2s ec76db4c1ac16400ac0e17ca9c4840e1d23da5dc
