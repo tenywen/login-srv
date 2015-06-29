@@ -1,28 +1,20 @@
 package main
 
 import (
-	"bytes"
 	"crypto/md5"
+	"hash"
 	"db"
-	"encoding/binary"
 	"errors"
-	"fmt"
-	"os"
 	"services"
 	"services/proto"
 	"strings"
-	"time"
 
 	"golang.org/x/net/context"
 )
 
 import (
 	pb "proto"
-	. "types"
-
 	log "github.com/GameGophers/libs/nsq-logger"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -36,32 +28,16 @@ const (
 	TABLE_AUTH = "auth"
 	SEQS_UID   = "uid"
 
-	LOGIN_TYPE_UUID = iota
-	LOGIN_TYPE_WEIXIN
-	LOGIN_TYPE_ALIPAY
-	LOGIN_TYPE_SINA
+	LOGIN_TYPE_UUID 	= iota 
+	LOGIN_TYPE_FACEBOOK
 )
 
-type server struct {
-	db *mgo.Database
-}
+var h hash.Hash
+
+type server struct {}
 
 func (s *server) init() {
-
-	// read mongodb host
-	mongodb_url := DEFAULT_MONGODB_URL
-	if env := os.Getenv(ENV_MONGODB_URL); env != "" {
-		mongodb_url = env
-	}
-
-	// start connection to mongodb
-	sess, err := mgo.Dial(mongodb_url)
-	if err != nil {
-		log.Critical(err)
-		os.Exit(-1)
-	}
-	// database is provided in url
-	s.db = sess.DB("")
+	h = md5.New()
 }
 
 //------------------------------------------------------- user login
@@ -71,41 +47,27 @@ func (s *server) Login(ctx context.Context, in *pb.User_LoginInfo) (*pb.User_Log
 	if uuid == "" {
 		return nil, errors.New("require uuid")
 	}
-	new_user := false
-	auth := Auth{}
+	cert := ""
+	// TODO 根据登录类型进行第三方验证
 	switch login_type {
-	case LOGIN_TYPE_UUID:
-		err := s.db.C(TABLE_AUTH).Find(bson.M{"uuid": uuid, "login_type": login_type}).One(&auth)
-		if err != nil {
-			if err != mgo.ErrNotFound {
-				return nil, err
-			}
-			//insert a new user? or do it on agent service.
-			uid := s.next_uid()
-			buf := new(bytes.Buffer)
-			binary.Write(buf, binary.LittleEndian, uid)
-			auth = Auth{
-				Id:         uid,
-				Uuid:       uuid,
-				Host:       in.Host,
-				LoginType:  int8(login_type),
-				Cert:       fmt.Sprintf("%x", md5.Sum(buf.Bytes())),
-				CreateTime: time.Now().Unix(),
-			}
-			log.Info("registe new user : %+v", auth)
-			// save to redis db.
-			db.Redis.Set(TABLE_AUTH, auth.Id, auth)
-			new_user = true
-		}
-	case LOGIN_TYPE_WEIXIN:
-		fallthrough
-	case LOGIN_TYPE_ALIPAY:
-		fallthrough
-	case LOGIN_TYPE_SINA:
-		return nil, errors.New("not support yet")
+	case LOGIN_TYPE_UUID:  // 不需要验证
+		// md5(uuid) -> cert 
+		cert = string(h.Sum([]byte(uuid)))
+	// TODO
+	case LOGIN_TYPE_FACEBOOK: // facebook  
+	default:
+		log.Error("login type error","logintype:",login_type,"uuid:",uuid) 
+		return nil,errors.New("login_type error")
 	}
-
-	return &pb.User_LoginResp{Uid: auth.Id, NewUser: new_user}, nil
+	new_user := false
+	id,exist := db.IsExist(cert,login_type) 
+	if !exist {
+		new_user = true
+		id = s.next_uid()
+		db.New(id,uuid,cert,in.Host,login_type)
+	}
+	
+	return &pb.User_LoginResp{Uid: id, NewUser: new_user}, nil
 }
 
 func (s *server) next_uid() int32 {

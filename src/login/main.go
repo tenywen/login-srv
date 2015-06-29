@@ -14,18 +14,18 @@ import (
 )
 
 const (
-	_port = ":50006"
+	port = ":50006"
 )
 
 func main() {
 	log.SetPrefix(SERVICE)
 	// 监听
-	lis, err := net.Listen("tcp", _port)
+	listen, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Critical(err)
 		os.Exit(-1)
 	}
-	log.Info("listening on ", lis.Addr())
+	log.Info("listening on ", listen.Addr())
 
 	// 注册服务
 	s := grpc.NewServer()
@@ -33,5 +33,5 @@ func main() {
 	ins.init()
 	pb.RegisterLoginServiceServer(s, ins)
 	// 开始服务
-	s.Serve(lis)
+	s.Serve(listen)
 }
