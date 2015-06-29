@@ -1,2 +1,2 @@
 # login-srv
-login service
+login service for auth
